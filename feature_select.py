@@ -66,6 +66,8 @@ for item in X:
 # Deleting loss and id columns
 del X['loss']
 del X['id']
+del X['f534']
+del X['f472']
 
 Train_X = X[0:37500]
 Train_Y = Y[0:37500]
@@ -78,3 +80,4 @@ Train_Y.to_csv("Train_Y.csv",index=False)
 Test_X.to_csv("Test_X.csv",index=False)
 Test_Y.to_csv("Test_Y.csv",index=False)
 idf.to_csv("idf.csv",index=False)
+featu
