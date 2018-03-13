@@ -27,12 +27,7 @@ def duplicate_columns(frame): #copied from github
 X = pd.read_csv('data_train.csv')
 X = pd.DataFrame(X)
 
-# Open testing data set
-test = pd.read_csv('data_train.csv')
-test = pd.DataFrame(test)
-
 # GET the labels with duplicate values
-'''Are the indices for duplicate values the same for training and testing???'''
 indices = duplicate_columns(X)
 
 # DELETE the columns with duplicate values
@@ -80,4 +75,3 @@ Train_Y.to_csv("Train_Y.csv",index=False)
 Test_X.to_csv("Test_X.csv",index=False)
 Test_Y.to_csv("Test_Y.csv",index=False)
 idf.to_csv("idf.csv",index=False)
-featu
