@@ -14,6 +14,33 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import KFold
 
+'''
+class PartialRegressor(object):
+
+    def __init__(self, clf):
+        self.clf = clf
+
+    def fit(self, X, y):
+        yy = y[y > 1]
+        XX = X[y > 0]
+        yy = np.log(yy)
+        temp = self.clf.fit(XX, yy)
+        for item in temp:
+            if temp[item].dtype not in ['float64']:
+                temp[item] = temp[item].astype(float)
+            #if test_X[item].dtype != train_X[item].dtype:
+            #    test_X[item] = test_X[item].astype(train_X[item].dtype)
+            if not all(temp[item].notnull()):
+                temp[item] = temp[item].fillna(temp[item].median())
+        return temp
+
+    def predict(self, X):
+        y = self.clf.predict(X)
+        y = np.exp(y)
+        y[y < 1] = 1.0
+        y[y > 100] = 100.0
+        return y
+'''
 def loadDat():
     '''
     train = pd.read_csv('data_train.csv')
@@ -24,7 +51,6 @@ def loadDat():
     train['f528_diff_f274'] = train.f528 - train.f274
     test['f527_diff_f528'] = train.f527 - train.f528
     test['f528_diff_f274'] = train.f528 - train.f274
-
     train_X = train#[featselect]
     train_Y = train.loss
     '''
@@ -35,13 +61,11 @@ def loadDat():
     '''
     test_X  = train[35000:49999]#[featselect]
     test_Y  = train.loss[35000:49999]
-
     del train_X['loss']
     del train_X['id']
     del test_X['loss']
     del test_X['id']
     realtest_X=test;
-
     for x in train_X:
         if train_X[x].dtype not in ['float64']:
             train_X[x] = train_X[x].astype(float)
@@ -75,14 +99,17 @@ def train_model(train_X,train_Y):
 #	train_Y[indicene]=0
     #classifier = linear_model.LogisticRegression(tol=0.00003, max_iter=10000, solver='saga')
     #classifier = GradientBoostingClassifier(n_estimators=65, learning_rate=0.3, max_depth=6, max_features='sqrt')
-    classifier = GradientBoostingRegressor(n_estimators=160, learning_rate=0.109, max_depth=5, max_features='sqrt')
+    classifier = GradientBoostingRegressor(loss='ls', n_estimators=500, learning_rate=0.0075, max_depth=10, max_features='sqrt', random_state=9753, verbose=0, min_samples_leaf=20, max_leaf_nodes=30, min_samples_split=20)
     classifier.fit(train_X, train_Y)
+    #clf = PartialRegressor(classifier)
+    #clf.fit(train_X, train_Y)
     return classifier
 
 def predictor(classifier, test_X, test_Y, idf):
-    cv = KFold(n_splits=10)
+    cv = KFold(n_splits=5)
     loss = cross_val_predict(classifier, test_X, test_Y, cv=cv)
     #loss=classifier.predict(realtest_X)
+    #loss = clf.predict(test_X)
     indicene = loss < 1
     loss[indicene] = 0
     test_X['loss'] = loss
