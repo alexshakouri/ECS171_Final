@@ -22,8 +22,11 @@ def loadDat():
     #real_test_X = pd.read_csv('Real_Test_X.csv')
     #full_train_X = pd.read_csv('Full_Train_X.csv')
     #full_train_Y = pd.read_csv('Full_Train_Y.csv')
-    feat = pd.read_csv('top_50.csv')
-    feat = feat['feat'].tolist()
+    feat = ['f140',	'f219',	'f220',	'f221',	'f251',	'f281',	'f282',	'f290',	'f291',	'f292',	'f294',	'f314',	'f315',	'f316',	'f319',	'f322',	'f323',	'f335',	'f400',
+    'f404',	'f405',	'f414',	'f415',	'f421', 'f428',	'f471',	'f515',	'f523',	'f526',	'f533',	'f536',	'f556',	'f589',	'f591',	'f592',	'f609',	'f612',	'f620',	'f621',	'f674',
+    'f675',	'f676',	'f699',	'f755',	'f765',	'f766',	'f767',	'f775',	'f776', 'f527_528',	'f274_527',	'f274_528',	'Log 271'
+    ,'f319_294', 'f674_294','f755_294', 'f674_319', 'f755_319', 'f612_609','f755_674', 'f755_699']
+
     train_X = train_X[feat]
 
     idf = pd.read_csv('idf.csv')
