@@ -24,7 +24,7 @@ def loadDat():
     #full_train_Y = pd.read_csv('Full_Train_Y.csv')
     feat = pd.read_csv('top_50.csv')
     feat = feat['feat'].tolist()
-    train_X[feat]
+    train_X = train_X[feat]
 
     idf = pd.read_csv('idf.csv')
     scale = StandardScaler()
@@ -64,7 +64,7 @@ def main():
     #load data
     train_X, train_Y, test_X, test_Y, idf = loadDat()
     #make default models
-    clf_model = train_model(full_train_X, full_train_Y)
+    clf_model = train_model(train_X, train_Y)
     #look at predictions
     predictor(clf_model, test_X, test_Y, idf)
 
