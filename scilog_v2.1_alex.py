@@ -22,34 +22,56 @@ def loadDat():
     test_X = pd.read_csv('Test_X.csv')
     test_Y = pd.read_csv('Test_Y.csv')
     
+    #UPLOAD TO KAGGLE
+    ##train_X = pd.read_csv('Full_Train_X.csv')
+    ##train_Y = pd.read_csv('Full_Train_Y.csv')
+    ##test_X = pd.read_csv('Real_Test_X.csv')
+    ##test_Y = pd.read_csv('Test_Y.csv')
+    
+  
     #choose only a certain amount of features that have a high correlation to loss
     #TOP 10 features
     #featselect = ['f281', 'f282', 'f400', 'f471', 'f536', 'f612', 'f675', 'f527_528', 'f274_527', 'f274_528'];
 
-    #f220, f316, f589, f592, f523
-    featselect =['f140','f219','f220', 'f221', 'f251', 'f281', 'f282', 'f290', 'f291', 'f292', 'f294', 'f314', 'f315','f316',  'f319', 'f322',  'f323', 'f335', 'f400', 'f404', 'f405', 'f414', 'f415', 'f421', 'f428', 'f471', 'f515', 'f523', 'f526', 'f533', 'f536', 'f556', 'f589', 'f591', 'f592', 'f609', 'f612', 'f620', 'f621', 'f674', 'f675', 'f676', 'f699', 'f755', 'f765', 'f766', 'f767', 'f775',  'f776', 'f527_528', 'f274_527', 'f274_528', 'Log 271'];
+     #ADD FEATURES DIFFERENCES
+    train_X['f674_294'] = train_X['f674'] - train_X['f294'];
+    train_X['f755_294'] = train_X['f755'] - train_X['f294'];
+    train_X['f674_319'] = train_X['f674'] - train_X['f319'];
+    train_X['f755_674'] = train_X['f755'] - train_X['f674'];
+    train_X['f274_f528_div'] = (train_X['f274']-train_X['f528']) / (train_X['f528']-train_X['f527']+1)
+    train_X['f271_div'] = (train_X['f271']) / (train_X['f528']-train_X['f527']+1)
 
-#featselect=list(set(featselect));  
+
+
+    test_X['f674_294'] = test_X['f674'] - test_X['f294'];
+    test_X['f755_294'] = test_X['f755'] - test_X['f294'];
+    test_X['f674_319'] = test_X['f674'] - test_X['f319'];
+    test_X['f755_674'] = test_X['f755'] - test_X['f674'];
+    test_X['f274_f528_div'] = (test_X['f274']-test_X['f528']) / (test_X['f528']-test_X['f527']+1)
+    test_X['f271_div'] = (test_X['f271']) / (test_X['f528']-test_X['f527']+1)
+     
+    #featselect = ['f2', 'f4', 'f5', 'f7', 'f8', 'f27', 'f67', 'f68', 'f140', 'f219', 'f220', 'f221', 'f229', 'f230', 'f271',
+    #'f274', 'f332', 'f336', 'f376', 'f515',    'f523',    'f526', 'f527', 'f528', 'f532', 'f533',    'f536',    'f556',    'f592',
+    #'f596', 'f608', 'f609',    'f612',    'f620',    'f621', 'f630', 'f647', 'f670', 'f767',    'f775',    'f776', 'f777', 'f778',
+    #'f527_528',    'f274_527',    'f274_528',    'Log 271', 'f274_f528_div', 'f271_div', 'f674_294','f755_294', 'f674_319',
+    #'f755_674']
+
+
+    featselect = ['f2', 'f4', 'f5', 'f7', 'f8', 'f27', 'f67', 'f68', 'f140', 'f219', 'f220', 'f221', 'f229', 'f230', 'f271',
+    'f274', 'f332', 'f336', 'f376', 'f515',    'f523',    'f526', 'f527', 'f528', 'f532', 'f533',    'f536',    'f556',    'f592',
+    'f596', 'f608', 'f609',    'f612',    'f620',    'f621', 'f630', 'f647', 'f670', 'f767',    'f775',    'f776', 'f777', 'f778',
+    'f527_528',    'f274_527',    'f274_528',    'Log 271', 'f274_f528_div', 'f271_div', 'f674_294','f755_294', 'f674_319',
+    'f755_674']
+
     
     print(np.shape(train_X))
     train_X = train_X[featselect];
     test_X = test_X[featselect];
-    print(np.shape(train_X))
    
-    #ADD FEATURES DIFFERENCES
-#    train_X['f319_294'] = train_X['f319'] - train_X['f294'];
-    train_X['f674_294'] = train_X['f674'] - train_X['f294'];
-    train_X['f755_294'] = train_X['f755'] - train_X['f294'];
-#    train_X['f612_609'] = train_X['f612'] - train_X['f609'];   
-    train_X['f755_699'] = train_X['f755'] - train_X['f699'];
-    print(np.shape(train_X));
 
-#    test_X['f319_294'] = test_X['f319'] - test_X['f294'];
-    test_X['f674_294'] = test_X['f674'] - test_X['f294'];
-    test_X['f755_294'] = test_X['f755'] - test_X['f294'];
-#    test_X['f612_609'] = test_X['f612'] - test_X['f609'];   
-    test_X['f755_699'] = test_X['f755'] - test_X['f699'];
- 
+
+    print (np.shape(test_X))
+
  
     '''
     test_X  = train[35000:49999]#[featselect]
@@ -89,19 +111,19 @@ def loadDat():
 def train_model(train_X,train_Y):
     #classifier = linear_model.LogisticRegression(tol=0.00003, max_iter=10000, solver='saga')
     #classifier = GradientBoostingClassifier(n_estimators=65, learning_rate=0.3, max_depth=6, max_features='sqrt')
-    classifier = GradientBoostingRegressor(n_estimators=700, learning_rate=0.0075, max_depth=5, max_features='sqrt', min_samples_leaf=20, max_leaf_nodes=30)
+    classifier = GradientBoostingRegressor(n_estimators=900, learning_rate=0.0075, max_depth=10 , max_features='sqrt', min_samples_leaf=20, max_leaf_nodes=30)
     classifier.fit(train_X, train_Y)
     return classifier
 
 def predictor(classifier, test_X, test_Y, idf):
     loss = cross_val_predict(classifier, test_X, test_Y, cv=5)
-    #loss=classifier.predict(realtest_X)
+    #loss=classifier.predict(test_X)
     indicene = loss < 1
     loss[indicene] = 0
     test_X['loss'] = loss
     test_X['id'] = idf
     #test_X = test_X.join(loss)
-    test_X[['id','loss']].to_csv("predictions.csv",index=False)
+    #test_X[['id','loss']].to_csv("predictions.csv",index=False)
     print "MAE", mean_absolute_error(test_Y, loss)
 
 
@@ -114,6 +136,9 @@ def main():
     clf_model = train_model(train_X, train_Y)
     #look at predictions
     predictor(clf_model, train_X, train_Y, idf)
+    #KAGGLE
+   # predictor(clf_model, test_X, test_Y, idf)
+   
     #save prediction
     #test[['id','loss']].to_csv("pred.csv",index=False)
 
