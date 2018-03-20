@@ -22,12 +22,30 @@ def loadDat():
     #real_test_X = pd.read_csv('Real_Test_X.csv')
     #full_train_X = pd.read_csv('Full_Train_X.csv')
     #full_train_Y = pd.read_csv('Full_Train_Y.csv')
-    feat = ['f140',	'f219',	'f220',	'f221',	'f251',	'f281',	'f282',	'f290',	'f291',	'f292',	'f294',	'f314',	'f315',	'f316',	'f319',	'f322',	'f323',	'f335',	'f400',
-    'f404',	'f405',	'f414',	'f415',	'f421', 'f428',	'f471',	'f515',	'f523',	'f526',	'f533',	'f536',	'f556',	'f589',	'f591',	'f592',	'f609',	'f612',	'f620',	'f621',	'f674',
-    'f675',	'f676',	'f699',	'f755',	'f765',	'f766',	'f767',	'f775',	'f776', 'f527_528',	'f274_527',	'f274_528',	'Log 271'
-    ,'f319_294', 'f674_294','f755_294', 'f674_319', 'f755_319', 'f612_609','f755_674', 'f755_699']
+    feat = [ 'f67', 'f670', 'f376' , 'f596' , 'f230', 'f630' , 'f229'  , 'f68',
+    'f2', 'f332','f336', 'f777', 'f4', 'f5', 'f647', 'f27', 'f778','f7', 'f608', 'f532', 'f8','f140', 'f274', 'f271', 'f219', 'f528', 'f527', 'f220','f221',
+    	'f515',	'f523',	'f526',	'f533',	'f536',	'f556',	'f592',	'f609',	'f612',	'f620',	'f621',
+    'f767',	'f775',	'f776', 'f527_528',	'f274_527',	'f274_528',	'Log 271']
+
+    #'f319_294','f319', 'f674','f755','f612_609','f755_699','f755_674','f755_319',,
+
+#f528-f527, (f274-f528)/(f528-f527+1), (f271)/(f528-f527+1),
 
     train_X = train_X[feat]
+    test_X = test_X[feat]
+
+    train_X['f274_f528_div'] = (train_X['f274']-train_X['f528']) / (train_X['f528']-train_X['f527']+1)
+    train_X['f271_div'] = (train_X['f271']) / (train_X['f528']-train_X['f527']+1)
+    train_X['f7_f608'] = train_X['f7']-train_X['f608']
+    train_X['f8_f532'] = train_X['f8']-train_X['f532']
+    train_X['f778_27'] = train_X['f778']-train_X['f27']
+
+    test_X['f274_f528_div'] = (test_X['f274']-test_X['f528']) / (test_X['f528']-test_X['f527']+1)
+    test_X['f271_div'] = (test_X['f271']) / (test_X['f528']-test_X['f527']+1)
+    test_X['f7_f608'] = test_X['f7']-test_X['f608']
+    test_X['f8_f532'] = test_X['f8']-test_X['f532']
+    test_X['f778_27'] = test_X['f778']-test_X['f27']
+
 
     idf = pd.read_csv('idf.csv')
     scale = StandardScaler()
@@ -58,7 +76,7 @@ def predictor(classifier, test_X, test_Y, idf):
     test_X['loss'] = loss
     test_X['id'] = idf
     test_X[['id','loss']].to_csv("predictions.csv",index=False)
-    print "MAE Loss Cross", mean_absolute_error(test_Y, loss)
+    print "MAE Loss:", mean_absolute_error(test_Y, loss)
 
 
 
