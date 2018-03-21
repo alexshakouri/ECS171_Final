@@ -13,6 +13,8 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import KFold
+from sklearn.feature_selection import RFE
+
 
 def loadDat():
 
@@ -40,6 +42,10 @@ def loadDat():
     train_X['f755_674'] = train_X['f755'] - train_X['f674'];
     train_X['f274_f528_div'] = (train_X['f274']-train_X['f528']) / (train_X['f528']-train_X['f527']+1)
     train_X['f271_div'] = (train_X['f271']) / (train_X['f528']-train_X['f527']+1)
+    train_X['f466_529'] = train_X['f466'] + train_X['f529'];
+    train_X['f664_759'] = train_X['f664'] + train_X['f759'];
+    train_X['Log 629'] = np.log(train_X['f629']+1)
+    train_X['Log 282'] = np.log(train_X['f282']+1)
 
 
 
@@ -49,6 +55,10 @@ def loadDat():
     test_X['f755_674'] = test_X['f755'] - test_X['f674'];
     test_X['f274_f528_div'] = (test_X['f274']-test_X['f528']) / (test_X['f528']-test_X['f527']+1)
     test_X['f271_div'] = (test_X['f271']) / (test_X['f528']-test_X['f527']+1)
+    test_X['f466_529'] = test_X['f466'] + test_X['f529'];
+    test_X['f664_759'] = test_X['f664'] + test_X['f759'];
+    test_X['Log 629'] = np.log(test_X['f629']+1)
+    test_X['Log 282'] = np.log(test_X['f282']+1)
      
     #featselect = ['f2', 'f4', 'f5', 'f7', 'f8', 'f27', 'f67', 'f68', 'f140', 'f219', 'f220', 'f221', 'f229', 'f230', 'f271',
     #'f274', 'f332', 'f336', 'f376', 'f515',    'f523',    'f526', 'f527', 'f528', 'f532', 'f533',    'f536',    'f556',    'f592',
@@ -56,14 +66,17 @@ def loadDat():
     #'f527_528',    'f274_527',    'f274_528',    'Log 271', 'f274_f528_div', 'f271_div', 'f674_294','f755_294', 'f674_319',
     #'f755_674']
 
+    featselect = ['f2', 'f4', 'f7', 'f8', 'f13', 'f27', 'f67', 'f68', 'f140',
+    'f219', 'f220', 'f221', 'f229', 'f230', 'f271', 'f274', 'f332', 'f336', 'f376', 'f515', 'f523', 'f526', 'f527',
+    'f528', 'f532', 'f533', 'f592', 'f596', 'f598', 'f608', 'f609', 'f612', 'f620', 'f621', 'f630', 'f647', 'f652',
+    'f670', 'f767', 'f775', 'f778', 'f527_528', 'f274_527', 'f274_528', 'Log 271', 'f274_f528_div',
+    'f271_div','f755_294', 'f674_319', 'f755_674', 'f466_529', 'f664_759', 'Log 282']
 
-    featselect = ['f2', 'f4', 'f5', 'f7', 'f8', 'f27', 'f67', 'f68', 'f140', 'f219', 'f220', 'f221', 'f229', 'f230', 'f271',
-    'f274', 'f332', 'f336', 'f376', 'f515',    'f523',    'f526', 'f527', 'f528', 'f532', 'f533',    'f536',    'f556',    'f592',
-    'f596', 'f608', 'f609',    'f612',    'f620',    'f621', 'f630', 'f647', 'f670', 'f767',    'f775',    'f776', 'f777', 'f778',
-    'f527_528',    'f274_527',    'f274_528',    'Log 271', 'f274_f528_div', 'f271_div', 'f674_294','f755_294', 'f674_319',
-    'f755_674']
 
-    
+    #Testing the features
+    #featselect = ['f527_528', 'f609', 'f526', 'f5', 'f514', 'f598', 'f67', 'f518', 'f13', 'f652', 'Log 629', 'Log 282']
+
+
     print(np.shape(train_X))
     train_X = train_X[featselect];
     test_X = test_X[featselect];
@@ -111,8 +124,14 @@ def loadDat():
 def train_model(train_X,train_Y):
     #classifier = linear_model.LogisticRegression(tol=0.00003, max_iter=10000, solver='saga')
     #classifier = GradientBoostingClassifier(n_estimators=65, learning_rate=0.3, max_depth=6, max_features='sqrt')
-    classifier = GradientBoostingRegressor(n_estimators=900, learning_rate=0.0075, max_depth=10 , max_features='sqrt', min_samples_leaf=20, max_leaf_nodes=30)
+    classifier = GradientBoostingRegressor(n_estimators=2000, learning_rate=0.0075, max_depth=10 , max_features='sqrt', min_samples_leaf=20, max_leaf_nodes=30)
     classifier.fit(train_X, train_Y)
+
+    #FEATURE SELECTION
+    #selector = RFE(classifier, 1)
+    #selector.fit(train_X, train_Y)
+    #print(selector.ranking_)
+
     return classifier
 
 def predictor(classifier, test_X, test_Y, idf):
