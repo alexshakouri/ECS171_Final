@@ -98,12 +98,27 @@ def train_model(train_X,train_Y):
     class_loss_x = pd.DataFrame(class_loss_x)
     print "Class Loss X:", np.shape(class_loss_x)
 
+    class_loss_y = pd.DataFrame(class_loss_y)
 
     #print classifier.feature_importances_
     class_X = pd.DataFrame.multiply(train_X, class_loss_x)
     print "Class X:", np.shape(class_X)
     class_Y = pd.DataFrame.multiply(train_Y, class_loss_y)
     print "Class Y:", np.shape(class_Y)
+
+
+    '''COPY THIS PART'''
+    for item in class_X:
+        if class_X[item].dtype not in ['float64']:
+            class_X[item] = class_X[item].astype(float)
+        if not all(class_X[item].notnull()):
+            class_X[item] = class_X[item].fillna(class_X[item].median())
+    for item in class_Y:
+        if class_Y[item].dtype not in ['float64']:
+            class_Y[item] = class_Y[item].astype(float)
+        if not all(class_Y[item].notnull()):
+            class_Y[item] = class_Y[item].fillna(class_Y[item].median())
+    '''STOP COPYING'''
 
     regressor = GradientBoostingRegressor(n_estimators=900, learning_rate=0.0075, max_depth=10 , max_features='sqrt', min_samples_leaf=20, max_leaf_nodes=30)
     regressor.fit(class_X, class_Y)
