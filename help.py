@@ -14,7 +14,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import KFold
-from sklearn import svm
+
 
 def loadDat():
 
@@ -49,14 +49,15 @@ def loadDat():
     
 
  #   test_X['f674_294'] = test_X['f674'] - test_X['f294'];
-    '''test_X['f755_294'] = test_X['f755'] - test_X['f294'];
+    test_X['f755_294'] = test_X['f755'] - test_X['f294'];
     test_X['f674_319'] = test_X['f674'] - test_X['f319'];
     test_X['f755_674'] = test_X['f755'] - test_X['f674'];
     test_X['f274_f528_div'] = (test_X['f274']-test_X['f528']) / (test_X['f528']-test_X['f527']+1)
     test_X['f271_div'] = (test_X['f271']) / (test_X['f528']-test_X['f527']+1)
     test_X['f466+f529'] = test_X['f466'] + test_X['f529']
     test_X['f664+f759'] = test_X['f664'] + test_X['f759']
-    test_X['log 282'] = np.log(test_X['f282']+1)'''
+    test_X['log 282'] = np.log(test_X['f282']+1)
+    
     #test_X['f712/f664'] = test_X['f712'] / test_X['f664']
     #featselect = ['f2', 'f4', 'f5', 'f7', 'f8', 'f27', 'f67', 'f68', 'f140', 'f219', 'f220', 'f221', 'f229', 'f230', 'f271',
     #'f274', 'f332', 'f336', 'f376', 'f515',    'f523',    'f526', 'f527', 'f528', 'f532', 'f533',    'f536',    'f556',    'f592',
@@ -74,7 +75,7 @@ def loadDat():
     
     #featselect = ['f527_528','f274_528','f274_527','f2', 'f271', 'f332', 'f776', 'f336','f777','f4','f5', 'f647', 'trial']
     train_X = train_X[featselect];
-    #test_X = test_X[featselect];
+    test_X = test_X[featselect];
    
 
 
@@ -100,11 +101,13 @@ def train_model(train_X,train_Y):
     decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
     max_iter=-1, probability=False, random_state=None, shrinking=True,
     tol=0.001, verbose=False)'''
+    temp = train_Y
+    
     indicepo = train_Y>=1
     indicene = train_Y<1
     train_Y[indicepo] = 1
     train_Y[indicene] = 0
-    
+
     classifier.fit(train_X, train_Y)
     class_loss = classifier.predict(train_X)
     
@@ -120,25 +123,39 @@ def train_model(train_X,train_Y):
     class_X = class_X[(class_X.T !=0).any()]
     print 'class_X shape', class_X.shape
     
-    class_Y = np.multiply(train_Y,class_loss_Y)
+    class_Y = np.multiply(temp,class_loss_Y)
     class_Y = pd.DataFrame(class_Y)
     class_Y = class_Y[(class_Y.T !=0).any()]
+    print 'class_Y shape', class_Y.shape
     
     regressor = GradientBoostingRegressor(n_estimators=500, learning_rate=0.0075, max_depth=10 , max_features='sqrt', min_samples_leaf=20, max_leaf_nodes=30)
     regressor.fit(class_X, class_Y)
+    print 'Trained'
     
     return regressor, classifier
 
 def predictor(classifier, regressor, test_X, test_Y, idf):
-    loss_classifier = cross_val_predict(classifier, test_X, test_Y, cv=5)
-    loss_regressor  = cross_val_predict(regressor, test_X, test_Y, cv=5)
+    #loss_classifier = cross_val_predict(classifier, test_X, test_Y, cv=5)
+    #loss_regressor  = cross_val_predict(regressor, test_X, test_Y, cv=5)
+    
+    loss_classifier = classifier.predict(test_X)
+    
+    loss_regressor = regressor.predict(test_X)
+    
     loss = loss_classifier * loss_regressor
+    np.round(loss)
     
     #loss=classifier.predict(test_X)
     indicene = loss < 1
+    indicepo = loss >= 1
     loss[indicene] = 0
+    loss[indicepo] = np.log(loss[indicepo])
     test_X['loss'] = loss
     test_X['id'] = idf
+    ine = test_Y < 1
+    ipo = test_Y >= 1
+    test_Y[ine] = 0
+    test_Y[ipo] = np.log(test_Y[ipo])
     #test_X = test_X.join(loss)
     #test_X[['id','loss']].to_csv("predictions.csv",index=False)
     print "MAE", mean_absolute_error(test_Y, loss)
