@@ -74,9 +74,7 @@ def loadDat():
     'f271_div','f755_294', 'f674_319', 'f755_674', 'f466_529', 'f664_759', 'Log 282']
     '''
 
-    #Testing the features
-    #featselect = ['f527_528', 'f609', 'f526', 'f5', 'f514', 'f598', 'f67', 'f518', 'f13', 'f652', 'Log 629', 'Log 282']
-    add_col = ['f274_f528_div','f271_div','f755_294', 'f674_319', 'f755_674', 'f466_529', 'f664_759', 'Log 282']
+    add_col = ['f274_f528_div', 'f271_div', 'f755_294', 'f674_319', 'f755_674', 'f466_529', 'f664_759', 'Log 282']
     featselect = []
 
     count = 0
@@ -89,13 +87,16 @@ def loadDat():
         count += 1
 
     print featselect
-    print "Num of Feat:", count
+    print "Num of headers", count
+
+
+    #Testing the features
+    #featselect = ['f281', 'f282', 'f400', 'f471', 'f536', 'f612', 'f675', 'f527_528', 'f274_527', 'f274_528'];
 
     print(np.shape(train_X))
     train_X = train_X[featselect];
     test_X = test_X[featselect];
     print (np.shape(test_X))
-
 
     idf = pd.read_csv('idf.csv')
     scale = StandardScaler()
@@ -118,9 +119,10 @@ def train_model(train_X,train_Y):
     selector = RFE(classifier, 1)
     selector.fit(train_X, train_Y)
     print(selector.ranking_)
+    print "saving ranking to csv"
     x = selector.ranking_
-    "Saving Data to CSV"
     np.savetxt("rankings.csv", x, delimiter=",")
+
 
     return classifier
 
@@ -144,9 +146,10 @@ def main():
     #make default models
     clf_model = train_model(train_X, train_Y)
     #look at predictions
-    #predictor(clf_model, train_X, train_Y, idf)
+    predictor(clf_model, train_X, train_Y, idf)
     #KAGGLE
    # predictor(clf_model, test_X, test_Y, idf)
+
 
 # run everything when calling script from CLI
 if __name__ == "__main__":
