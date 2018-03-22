@@ -34,7 +34,6 @@ def loadDat():
     train_X['f274_f528_div'] = (train_X['f274']-train_X['f528']) / (train_X['f528']-train_X['f527']+1)
     train_X['f271_div'] = (train_X['f271']) / (train_X['f528']-train_X['f527']+1)
 
-
     test_X['f674_294'] = test_X['f674'] - test_X['f294'];
     test_X['f755_294'] = test_X['f755'] - test_X['f294'];
     test_X['f674_319'] = test_X['f674'] - test_X['f319'];
@@ -42,6 +41,7 @@ def loadDat():
     test_X['f274_f528_div'] = (test_X['f274']-test_X['f528']) / (test_X['f528']-test_X['f527']+1)
     test_X['f271_div'] = (test_X['f271']) / (test_X['f528']-test_X['f527']+1)
 
+    # Our 53 features that we selected
     featselect = ['f2', 'f4', 'f5', 'f7', 'f8', 'f27', 'f67', 'f68', 'f140', 'f219', 'f220', 'f221', 'f229', 'f230', 'f271',
     'f274', 'f332', 'f336', 'f376', 'f515', 'f523', 'f526', 'f527', 'f528', 'f532', 'f533', 'f536', 'f556', 'f592',
     'f596', 'f608', 'f609', 'f612', 'f620', 'f621', 'f630', 'f647', 'f670', 'f767', 'f775', 'f776', 'f777', 'f778',
@@ -58,9 +58,6 @@ def loadDat():
     train_X = pd.DataFrame(scale.fit_transform(train_X))
     test_X = pd.DataFrame(scale.fit_transform(test_X))
 
-
-    #realtest_X = pd.DataFrame(scale.fit_transform(realtest_X))
-    #return train_X, train_Y, test_X, test_Y, realtest_X,idf
     return train_X, train_Y, test_X, test_Y, idf
 
 def train_model(train_X,train_Y):
@@ -89,11 +86,9 @@ def predictor(classifier1,classifier2, test_X, test_Y, idf):
     #print("MAE", mean_absolute_error(test_Y, loss))
 
 
-
 def main():
     """ Combine functions to make predictions """
     #load data
-    #train_X, train_Y, test_X, test_Y, realtest_X,idf= loadDat()
     train_X, train_Y, test_X, test_Y, idf = loadDat()
     #make default models
     clf_model1,clf_model2 = train_model(train_X, train_Y)
@@ -101,11 +96,6 @@ def main():
     predictor(clf_model1,clf_model2, test_X, test_Y, idf)
     #KAGGLE
    # predictor(clf_model, test_X, test_Y, idf)
-
-    #save prediction
-    #test[['id','loss']].to_csv("pred.csv",index=False)
-
-
 
 
 # run everything when calling script from CLI
